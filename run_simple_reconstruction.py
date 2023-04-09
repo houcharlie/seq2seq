@@ -94,7 +94,7 @@ if accelerator.is_main_process:
 
 accelerator.wait_for_everyone()
 
-dataset = load_dataset(dataset_name, split="train[:5000000]", cache_dir='/home/ubuntu/huggingface')
+dataset = load_dataset(dataset_name, split="train", cache_dir='/home/ubuntu/huggingface')
 train_data_txt, validation_data_txt = dataset.train_test_split(test_size=0.1).values()
 # if "validation" not in raw_datasets.keys():
 
