@@ -243,7 +243,7 @@ for epoch in range(starting_epoch, num_train_epochs):
         
         with accelerator.main_process_first():
             if step % 1000 == 0:
-                print('Epoch', epoch, 'step', step, 'loss', loss.detach().float())
+                print('Epoch', epoch, 'step', step, 'loss', loss.detach().float(), 'percent done', step/num_update_steps_per_epoch)
 
         if completed_steps >= max_train_steps:
             break
