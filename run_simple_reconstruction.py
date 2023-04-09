@@ -33,7 +33,7 @@ from transformers import (
 )
 from transformers.utils import check_min_version, get_full_repo_name, send_example_telemetry
 from transformers.utils.versions import require_version
-from models.conditioned_gpt2 import RobertaCondGPT2
+from models.conditioned_gpt2_simple import RobertaCondGPT2
 logger = get_logger(__name__)
 
 ## parameters
@@ -75,7 +75,7 @@ accelerator_log_kwargs = {}
 accelerator_log_kwargs["log_with"] = report_to
 accelerator_log_kwargs["logging_dir"] = output_dir
 kwargs = DistributedDataParallelKwargs(find_unused_parameters=True)
-accelerator = Accelerator(gradient_accumulation_steps=gradient_accumulation_steps, kwargs_handlers=[kwargs], project_config=ProjectConfiguration(total_limit=2,automatic_checkpoint_naming=True, project_dir=output_dir),**accelerator_log_kwargs)
+accelerator = Accelerator(gradient_accumulation_steps=gradient_accumulation_steps, kwargs_handlers=[kwargs], **accelerator_log_kwargs)
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
     datefmt="%m/%d/%Y %H:%M:%S",
@@ -280,7 +280,7 @@ for epoch in range(starting_epoch, num_train_epochs):
         curr_output_dir = f"epoch_{epoch}"
         if output_dir is not None:
             curr_output_dir = os.path.join(output_dir, curr_output_dir)
-        accelerator.save_state()
+        accelerator.save_state(curr_output_dir)
 if output_dir is not None:
     curr_output_dir = os.path.join(output_dir, 'final_epoch')
     accelerator.wait_for_everyone()

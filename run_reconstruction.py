@@ -38,7 +38,7 @@ logger = get_logger(__name__)
 
 ## parameters
 gradient_accumulation_steps = 64
-output_dir = '/home/ubuntu/condgpt2_simple'
+output_dir = '/home/ubuntu/condgpt2'
 max_seq_length = 64
 data_num_workers = 51
 dataset_name = 'bookcorpus'
@@ -75,7 +75,7 @@ accelerator_log_kwargs = {}
 accelerator_log_kwargs["log_with"] = report_to
 accelerator_log_kwargs["logging_dir"] = output_dir
 kwargs = DistributedDataParallelKwargs(find_unused_parameters=True)
-accelerator = Accelerator(gradient_accumulation_steps=gradient_accumulation_steps, kwargs_handlers=[kwargs], project_config=ProjectConfiguration(total_limit=2,automatic_checkpoint_naming=True, project_dir=output_dir),**accelerator_log_kwargs)
+accelerator = Accelerator(gradient_accumulation_steps=gradient_accumulation_steps, kwargs_handlers=[kwargs],**accelerator_log_kwargs)
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
     datefmt="%m/%d/%Y %H:%M:%S",
@@ -94,7 +94,7 @@ if accelerator.is_main_process:
 
 accelerator.wait_for_everyone()
 
-dataset = load_dataset(dataset_name, split="train[:5000000]", cache_dir='/home/ubuntu/huggingface')
+dataset = load_dataset(dataset_name, split="train[:1000]", cache_dir='/home/ubuntu/huggingface')
 train_data_txt, validation_data_txt = dataset.train_test_split(test_size=0.1).values()
 # if "validation" not in raw_datasets.keys():
 
@@ -280,7 +280,7 @@ for epoch in range(starting_epoch, num_train_epochs):
         curr_output_dir = f"epoch_{epoch}"
         if output_dir is not None:
             curr_output_dir = os.path.join(output_dir, curr_output_dir)
-        accelerator.save_state()
+        accelerator.save_state(curr_output_dir)
 if output_dir is not None:
     curr_output_dir = os.path.join(output_dir, 'final_epoch')
     accelerator.wait_for_everyone()
