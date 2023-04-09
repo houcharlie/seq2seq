@@ -37,7 +37,7 @@ from models.conditioned_gpt2 import RobertaCondGPT2
 logger = get_logger(__name__)
 
 ## parameters
-gradient_accumulation_steps = 1
+gradient_accumulation_steps = 8
 output_dir = '/dev/shm/seq2seq/condgpt2'
 max_seq_length = 64
 data_num_workers = 5
@@ -47,7 +47,7 @@ per_device_eval_batch_size = 8
 weight_decay = 0.1
 learning_rate = 5e-5
 max_train_steps = None
-num_train_epochs = 500
+num_train_epochs = 100
 num_warmup_steps = 500
 checkpointing_steps_set = 'epoch'
 log_steps = 1
@@ -93,7 +93,7 @@ if accelerator.is_main_process:
 
 accelerator.wait_for_everyone()
 
-dataset = load_dataset(dataset_name, split="train[:1000]", cache_dir='/dev/shm/huggingface')
+dataset = load_dataset(dataset_name, split="train", cache_dir='/dev/shm/huggingface')
 train_data_txt, validation_data_txt = dataset.train_test_split(test_size=0.1).values()
 # if "validation" not in raw_datasets.keys():
 
@@ -242,10 +242,8 @@ for epoch in range(starting_epoch, num_train_epochs):
         #         accelerator.save_state(output_dir)
         
         with accelerator.main_process_first():
-            if step % 100 == 0:
+            if step % 1000 == 0:
                 print('Epoch', epoch, 'step', step, 'loss', loss.detach().float())
-                print('Logits of first word', outputs.logits[0,0,:])
-                print('Argmax of first word', torch.argmax(outputs.logits[0,0,:]))
 
         if completed_steps >= max_train_steps:
             break
