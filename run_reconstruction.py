@@ -13,7 +13,6 @@ from accelerate import Accelerator, DistributedType
 from accelerate.logging import get_logger
 from accelerate.utils import set_seed
 from datasets import load_dataset
-from huggingface_hub import Repository, create_repo
 from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
 from tabulate import tabulate
@@ -38,10 +37,10 @@ from models.conditioned_gpt2 import RobertaCondGPT2
 logger = get_logger(__name__)
 
 ## parameters
-gradient_accumulation_steps = 8
+gradient_accumulation_steps = 1
 output_dir = '/dev/shm/seq2seq/condgpt2'
-max_seq_length = 512
-data_num_workers = 11
+max_seq_length = 64
+data_num_workers = 5
 dataset_name = 'bookcorpus'
 per_device_train_batch_size = 8
 per_device_eval_batch_size = 8
@@ -55,7 +54,7 @@ log_steps = 1
 report_to = 'wandb'
 lr_scheduler_type = 'linear'
 generation_config = GenerationConfig.from_pretrained("gpt2")
-generation_config.max_new_tokens = 512
+generation_config.max_new_tokens = max_seq_length
 args = {}
 args['gradient_accumulation_steps'] = gradient_accumulation_steps
 args['output_dir'] = output_dir
@@ -124,11 +123,16 @@ def tokenize_function(examples):
     roberta_attn_mask = roberta_inputs['attention_mask']
     gpt2_input_ids = gpt2_inputs['input_ids']
     gpt2_attn_mask = gpt2_inputs['attention_mask']
+    labels = [
+        [-100 if token == gpt2_tokenizer.pad_token_id else token for token in l]
+        for l in gpt2_input_ids
+    ]
 
     all_inputs = {'input_ids': roberta_input_ids,
                   'attention_mask': roberta_attn_mask,
                   'decoder_input_ids': gpt2_input_ids,
-                  'decoder_attention_mask': gpt2_attn_mask}
+                  'decoder_attention_mask': gpt2_attn_mask,
+                  'labels': labels}
     
     return all_inputs
 
@@ -238,7 +242,7 @@ for epoch in range(starting_epoch, num_train_epochs):
         #         accelerator.save_state(output_dir)
         
         with accelerator.main_process_first():
-            if step % 500 == 0:
+            if step % 100 == 0:
                 print('Epoch', epoch, 'step', step, 'loss', loss.detach().float())
                 print('Logits of first word', outputs.logits[0,0,:])
                 print('Argmax of first word', torch.argmax(outputs.logits[0,0,:]))
@@ -277,7 +281,7 @@ for epoch in range(starting_epoch, num_train_epochs):
         curr_output_dir = f"epoch_{epoch}"
         if output_dir is not None:
             curr_output_dir = os.path.join(output_dir, curr_output_dir)
-        accelerator.save_state(curr_output_dir)
+        # accelerator.save_state(curr_output_dir)
 if output_dir is not None:
     curr_output_dir = os.path.join(output_dir, 'final_epoch')
     accelerator.wait_for_everyone()
