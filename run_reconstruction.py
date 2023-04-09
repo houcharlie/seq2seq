@@ -9,9 +9,9 @@ from pathlib import Path
 
 import datasets
 import torch
-from accelerate import Accelerator, DistributedType
+from accelerate import Accelerator, DistributedType, DistributedDataParallelKwargs
 from accelerate.logging import get_logger
-from accelerate.utils import set_seed
+from accelerate.utils import set_seed, ProjectConfiguration
 from datasets import load_dataset
 from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
@@ -37,13 +37,13 @@ from models.conditioned_gpt2 import RobertaCondGPT2
 logger = get_logger(__name__)
 
 ## parameters
-gradient_accumulation_steps = 8
+gradient_accumulation_steps = 64
 output_dir = '/dev/shm/seq2seq/condgpt2'
 max_seq_length = 64
-data_num_workers = 5
+data_num_workers = 51
 dataset_name = 'bookcorpus'
-per_device_train_batch_size = 8
-per_device_eval_batch_size = 8
+per_device_train_batch_size = 16
+per_device_eval_batch_size = 16
 weight_decay = 0.1
 learning_rate = 5e-5
 max_train_steps = None
@@ -74,7 +74,8 @@ accelerator_log_kwargs = {}
 
 accelerator_log_kwargs["log_with"] = report_to
 accelerator_log_kwargs["logging_dir"] = output_dir
-accelerator = Accelerator(gradient_accumulation_steps=gradient_accumulation_steps, **accelerator_log_kwargs)
+kwargs = DistributedDataParallelKwargs(find_unused_parameters=True)
+accelerator = Accelerator(gradient_accumulation_steps=gradient_accumulation_steps, kwargs_handlers=[kwargs], project_config=ProjectConfiguration(total_limit=2,automatic_checkpoint_naming=True, project_dir=output_dir),**accelerator_log_kwargs)
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
     datefmt="%m/%d/%Y %H:%M:%S",
@@ -93,7 +94,7 @@ if accelerator.is_main_process:
 
 accelerator.wait_for_everyone()
 
-dataset = load_dataset(dataset_name, split="train", cache_dir='/dev/shm/huggingface')
+dataset = load_dataset(dataset_name, split="train[:5000000]", cache_dir='/dev/shm/huggingface')
 train_data_txt, validation_data_txt = dataset.train_test_split(test_size=0.1).values()
 # if "validation" not in raw_datasets.keys():
 
@@ -241,7 +242,7 @@ for epoch in range(starting_epoch, num_train_epochs):
         #             output_dir = os.path.join(output_dir, output_dir)
         #         accelerator.save_state(output_dir)
         
-        with accelerator.main_process_first():
+        if accelerator.is_main_process:
             if step % 1000 == 0:
                 print('Epoch', epoch, 'step', step, 'loss', loss.detach().float(), 'percent done', step/num_update_steps_per_epoch)
 
@@ -263,8 +264,8 @@ for epoch in range(starting_epoch, num_train_epochs):
         perplexity = math.exp(eval_loss)
     except OverflowError:
         perplexity = float("inf")
-
-    logger.info(f"epoch {epoch}: perplexity: {perplexity} eval_loss: {eval_loss}")
+    if accelerator.is_main_process:
+        logger.info(f"epoch {epoch}: perplexity: {perplexity} eval_loss: {eval_loss}")
     accelerator.log(
                 {
                     "perplexity": perplexity,
@@ -279,7 +280,7 @@ for epoch in range(starting_epoch, num_train_epochs):
         curr_output_dir = f"epoch_{epoch}"
         if output_dir is not None:
             curr_output_dir = os.path.join(output_dir, curr_output_dir)
-        # accelerator.save_state(curr_output_dir)
+        accelerator.save_state()
 if output_dir is not None:
     curr_output_dir = os.path.join(output_dir, 'final_epoch')
     accelerator.wait_for_everyone()
@@ -295,53 +296,53 @@ if output_dir is not None:
 
 
 
-
-def generate_summary(test_samples, model):
-    inputs = roberta_tokenizer(
-        test_samples["text"],
-        padding="max_length",
-        truncation=True,
-        max_length=max_seq_length,
-        return_tensors="pt",
-    )
-    input_ids = inputs.input_ids.to(model.device)
-    attention_mask = inputs.attention_mask.to(model.device)
-    outputs = model.generate(input_ids, attention_mask=attention_mask, generation_config=generation_config, max_new_tokens=512)
-    print(inputs)
-    print(outputs)
-    output_str = gpt2_tokenizer.batch_decode(outputs, skip_special_tokens=True)
-    return outputs, output_str
-
-
-test_samples = validation_data_txt.select(range(16))
-train_samples = train_data_txt.select(range(16))
-
-summaries_after_tuning = generate_summary(test_samples, model)[1]
-
-
-print(
-    tabulate(
-        zip(
-            range(len(summaries_after_tuning)),
+if accelerator.is_main_process:
+    def generate_summary(test_samples, model):
+        inputs = roberta_tokenizer(
             test_samples["text"],
-            summaries_after_tuning,
+            padding="max_length",
+            truncation=True,
+            max_length=max_seq_length,
+            return_tensors="pt",
+        )
+        input_ids = inputs.input_ids.to(model.device)
+        attention_mask = inputs.attention_mask.to(model.device)
+        outputs = model.generate(input_ids, attention_mask=attention_mask, generation_config=generation_config, max_new_tokens=512)
+        print(inputs)
+        print(outputs)
+        output_str = gpt2_tokenizer.batch_decode(outputs, skip_special_tokens=True)
+        return outputs, output_str
 
-        ),
-        headers=["Id", "Text before [test]", "Text after [test]"],
+
+    test_samples = validation_data_txt.select(range(16))
+    train_samples = train_data_txt.select(range(16))
+
+    summaries_after_tuning = generate_summary(test_samples, model)[1]
+
+
+    print(
+        tabulate(
+            zip(
+                range(len(summaries_after_tuning)),
+                test_samples["text"],
+                summaries_after_tuning,
+
+            ),
+            headers=["Id", "Text before [test]", "Text after [test]"],
+        )
     )
-)
 
-summaries_after_tuning = generate_summary(train_samples, model)[1]
+    summaries_after_tuning = generate_summary(train_samples, model)[1]
 
 
-print(
-    tabulate(
-        zip(
-            range(len(summaries_after_tuning)),
-            train_samples["text"],
-            summaries_after_tuning,
-        ),
-        headers=["Id", "Text before [train]", "Text after [train]"],
+    print(
+        tabulate(
+            zip(
+                range(len(summaries_after_tuning)),
+                train_samples["text"],
+                summaries_after_tuning,
+            ),
+            headers=["Id", "Text before [train]", "Text after [train]"],
+        )
     )
-)
 
