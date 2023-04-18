@@ -54,6 +54,7 @@ log_steps = 1
 report_to = 'wandb'
 lr_scheduler_type = 'linear'
 generation_config = GenerationConfig.from_pretrained("gpt2")
+max_new_tokens = max_seq_length
 generation_config.max_new_tokens = max_seq_length
 args = {}
 args['gradient_accumulation_steps'] = gradient_accumulation_steps
@@ -94,7 +95,7 @@ if accelerator.is_main_process:
 
 accelerator.wait_for_everyone()
 
-dataset = load_dataset(dataset_name, split="train", cache_dir='/home/ubuntu/huggingface')
+dataset = load_dataset(dataset_name, split="train[:1000]", cache_dir='/home/ubuntu/huggingface')
 train_data_txt, validation_data_txt = dataset.train_test_split(test_size=0.1).values()
 # if "validation" not in raw_datasets.keys():
 
@@ -245,6 +246,7 @@ for epoch in range(starting_epoch, num_train_epochs):
         if accelerator.is_main_process:
             if step % 1000 == 0:
                 print('Epoch', epoch, 'step', step, 'loss', loss.detach().float(), 'percent done', step/num_update_steps_per_epoch)
+                print('Argmax token', torch.argmax(outputs['logits'][0,0,:]))
 
         if completed_steps >= max_train_steps:
             break
@@ -281,68 +283,68 @@ for epoch in range(starting_epoch, num_train_epochs):
         if output_dir is not None:
             curr_output_dir = os.path.join(output_dir, curr_output_dir)
         accelerator.save_state(curr_output_dir)
+        if accelerator.is_main_process:
+            unwrapped_model = accelerator.unwrap_model(model)
+            def generate_summary(test_samples, model):
+                inputs = roberta_tokenizer(
+                    test_samples["text"],
+                    padding="max_length",
+                    truncation=True,
+                    max_length=max_seq_length,
+                    return_tensors="pt",
+                )
+                input_ids = inputs.input_ids.to(model.device)
+                attention_mask = inputs.attention_mask.to(model.device)
+                outputs = unwrapped_model.generate(input_ids, attention_mask=attention_mask, generation_config=generation_config, max_new_tokens=max_seq_length)
+                output_str = gpt2_tokenizer.batch_decode(outputs, skip_special_tokens=False)
+                return outputs, output_str
+
+
+            test_samples = validation_data_txt.select(range(16))
+            train_samples = train_data_txt.select(range(16))
+
+            summaries_after_tuning = generate_summary(test_samples, model)[1]
+
+
+            print(
+                tabulate(
+                    zip(
+                        range(len(summaries_after_tuning)),
+                        test_samples["text"],
+                        summaries_after_tuning,
+
+                    ),
+                    headers=["Id", "Text before [test]", "Text after [test]"],
+                )
+            )
+
+            summaries_after_tuning = generate_summary(train_samples, model)[1]
+
+
+            print(
+                tabulate(
+                    zip(
+                        range(len(summaries_after_tuning)),
+                        train_samples["text"],
+                        summaries_after_tuning,
+                    ),
+                    headers=["Id", "Text before [train]", "Text after [train]"],
+                )
+            )
 if output_dir is not None:
     curr_output_dir = os.path.join(output_dir, 'final_epoch')
     accelerator.wait_for_everyone()
     unwrapped_model = accelerator.unwrap_model(model)
     unwrapped_model.save_pretrained(
-        output_dir, is_main_process=accelerator.is_main_process, save_function=accelerator.save
+        curr_output_dir, is_main_process=accelerator.is_main_process, save_function=accelerator.save
     )
     if accelerator.is_main_process:
-        gpt2_tokenizer.save_pretrained(os.path.join(output_dir, 'gpt2_tokenizer'))
-        roberta_tokenizer.save_pretrained(os.path.join(output_dir, 'roberta_tokenizer'))
+        gpt2_tokenizer.save_pretrained(os.path.join(curr_output_dir, 'gpt2_tokenizer'))
+        roberta_tokenizer.save_pretrained(os.path.join(curr_output_dir, 'roberta_tokenizer'))
         with open(os.path.join(output_dir, "all_results.json"), "w") as f:
             json.dump({"perplexity": perplexity}, f)
 
 
 
-if accelerator.is_main_process:
-    def generate_summary(test_samples, model):
-        inputs = roberta_tokenizer(
-            test_samples["text"],
-            padding="max_length",
-            truncation=True,
-            max_length=max_seq_length,
-            return_tensors="pt",
-        )
-        input_ids = inputs.input_ids.to(model.device)
-        attention_mask = inputs.attention_mask.to(model.device)
-        outputs = model.generate(input_ids, attention_mask=attention_mask, generation_config=generation_config, max_new_tokens=512)
-        print(inputs)
-        print(outputs)
-        output_str = gpt2_tokenizer.batch_decode(outputs, skip_special_tokens=True)
-        return outputs, output_str
 
-
-    test_samples = validation_data_txt.select(range(16))
-    train_samples = train_data_txt.select(range(16))
-
-    summaries_after_tuning = generate_summary(test_samples, model)[1]
-
-
-    print(
-        tabulate(
-            zip(
-                range(len(summaries_after_tuning)),
-                test_samples["text"],
-                summaries_after_tuning,
-
-            ),
-            headers=["Id", "Text before [test]", "Text after [test]"],
-        )
-    )
-
-    summaries_after_tuning = generate_summary(train_samples, model)[1]
-
-
-    print(
-        tabulate(
-            zip(
-                range(len(summaries_after_tuning)),
-                train_samples["text"],
-                summaries_after_tuning,
-            ),
-            headers=["Id", "Text before [train]", "Text after [train]"],
-        )
-    )
 

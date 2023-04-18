@@ -623,7 +623,17 @@ class RobertaCondGPT2(PreTrainedModel):
             output_hidden_states=output_hidden_states,
             return_dict=return_dict,)
 
-        return lm_output
+        return Seq2SeqLMOutput(
+            loss=lm_output.loss,
+            logits=lm_output.logits,
+            past_key_values=outputs.past_key_values,
+            decoder_hidden_states=outputs.decoder_hidden_states,
+            decoder_attentions=outputs.decoder_attentions,
+            cross_attentions=outputs.cross_attentions,
+            encoder_last_hidden_state=outputs.encoder_last_hidden_state,
+            encoder_hidden_states=outputs.encoder_hidden_states,
+            encoder_attentions=outputs.encoder_attentions,
+        )
     
     def get_encoder(self):
         return self.encoder

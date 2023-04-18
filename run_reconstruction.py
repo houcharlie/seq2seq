@@ -75,7 +75,7 @@ accelerator_log_kwargs = {}
 accelerator_log_kwargs["log_with"] = report_to
 accelerator_log_kwargs["logging_dir"] = output_dir
 kwargs = DistributedDataParallelKwargs(find_unused_parameters=True)
-accelerator = Accelerator(gradient_accumulation_steps=gradient_accumulation_steps, kwargs_handlers=[kwargs],**accelerator_log_kwargs)
+accelerator = Accelerator(gradient_accumulation_steps=gradient_accumulation_steps, kwargs_handlers=[kwargs], **accelerator_log_kwargs)
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
     datefmt="%m/%d/%Y %H:%M:%S",
@@ -281,68 +281,70 @@ for epoch in range(starting_epoch, num_train_epochs):
         if output_dir is not None:
             curr_output_dir = os.path.join(output_dir, curr_output_dir)
         accelerator.save_state(curr_output_dir)
+        if accelerator.is_main_process:
+            unwrapped_model = accelerator.unwrap_model(model)
+            def generate_summary(test_samples, model):
+                inputs = roberta_tokenizer(
+                    test_samples["text"],
+                    padding="max_length",
+                    truncation=True,
+                    max_length=max_seq_length,
+                    return_tensors="pt",
+                )
+                input_ids = inputs.input_ids.to(model.device)
+                attention_mask = inputs.attention_mask.to(model.device)
+                outputs = unwrapped_model.generate(input_ids, attention_mask=attention_mask, generation_config=generation_config, max_new_tokens=512)
+                print(inputs)
+                print(outputs)
+                output_str = gpt2_tokenizer.batch_decode(outputs, skip_special_tokens=True)
+                return outputs, output_str
+
+
+            test_samples = validation_data_txt.select(range(16))
+            train_samples = train_data_txt.select(range(16))
+
+            summaries_after_tuning = generate_summary(test_samples, model)[1]
+
+
+            print(
+                tabulate(
+                    zip(
+                        range(len(summaries_after_tuning)),
+                        test_samples["text"],
+                        summaries_after_tuning,
+
+                    ),
+                    headers=["Id", "Text before [test]", "Text after [test]"],
+                )
+            )
+
+            summaries_after_tuning = generate_summary(train_samples, model)[1]
+
+
+            print(
+                tabulate(
+                    zip(
+                        range(len(summaries_after_tuning)),
+                        train_samples["text"],
+                        summaries_after_tuning,
+                    ),
+                    headers=["Id", "Text before [train]", "Text after [train]"],
+                )
+            )
 if output_dir is not None:
     curr_output_dir = os.path.join(output_dir, 'final_epoch')
     accelerator.wait_for_everyone()
     unwrapped_model = accelerator.unwrap_model(model)
     unwrapped_model.save_pretrained(
-        output_dir, is_main_process=accelerator.is_main_process, save_function=accelerator.save
+        curr_output_dir, is_main_process=accelerator.is_main_process, save_function=accelerator.save
     )
     if accelerator.is_main_process:
-        gpt2_tokenizer.save_pretrained(os.path.join(output_dir, 'gpt2_tokenizer'))
-        roberta_tokenizer.save_pretrained(os.path.join(output_dir, 'roberta_tokenizer'))
+        gpt2_tokenizer.save_pretrained(os.path.join(curr_output_dir, 'gpt2_tokenizer'))
+        roberta_tokenizer.save_pretrained(os.path.join(curr_output_dir, 'roberta_tokenizer'))
         with open(os.path.join(output_dir, "all_results.json"), "w") as f:
             json.dump({"perplexity": perplexity}, f)
 
 
 
-if accelerator.is_main_process:
-    def generate_summary(test_samples, model):
-        inputs = roberta_tokenizer(
-            test_samples["text"],
-            padding="max_length",
-            truncation=True,
-            max_length=max_seq_length,
-            return_tensors="pt",
-        )
-        input_ids = inputs.input_ids.to(model.device)
-        attention_mask = inputs.attention_mask.to(model.device)
-        outputs = model.generate(input_ids, attention_mask=attention_mask, generation_config=generation_config, max_new_tokens=512)
-        print(inputs)
-        print(outputs)
-        output_str = gpt2_tokenizer.batch_decode(outputs, skip_special_tokens=True)
-        return outputs, output_str
 
-
-    test_samples = validation_data_txt.select(range(16))
-    train_samples = train_data_txt.select(range(16))
-
-    summaries_after_tuning = generate_summary(test_samples, model)[1]
-
-
-    print(
-        tabulate(
-            zip(
-                range(len(summaries_after_tuning)),
-                test_samples["text"],
-                summaries_after_tuning,
-
-            ),
-            headers=["Id", "Text before [test]", "Text after [test]"],
-        )
-    )
-
-    summaries_after_tuning = generate_summary(train_samples, model)[1]
-
-
-    print(
-        tabulate(
-            zip(
-                range(len(summaries_after_tuning)),
-                train_samples["text"],
-                summaries_after_tuning,
-            ),
-            headers=["Id", "Text before [train]", "Text after [train]"],
-        )
-    )
 

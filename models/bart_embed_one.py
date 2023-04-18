@@ -621,7 +621,7 @@ class BartForConditionalGenerationOne(BartPretrainedModel):
 
         masked_lm_loss = None
         if labels is not None:
-            loss_fct = CrossEntropyLoss()
+            loss_fct = CrossEntropyLoss(label_smoothing=0.1)
             masked_lm_loss = loss_fct(lm_logits.view(-1, self.config.vocab_size), labels.view(-1))
 
         if not return_dict:
