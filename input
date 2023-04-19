@@ -1,1 +1,1 @@
-OMP_NUM_THREADS=6 python -m torch.distributed.launch --nproc_per_node 8 run_reconstruction.py
+OMP_NUM_THREADS=6 python -m torch.distributed.launch --nproc_per_node 8 run_bart_noise.py
