@@ -37,18 +37,18 @@ from models.bart_embed_one import BartForConditionalGenerationOneNoise
 logger = get_logger(__name__)
 
 ## parameters
-batch_noise = 8
+batch_noise = 4
 gradient_accumulation_steps = 64
-output_dir = '/home/ubuntu/bartone_noise_batch'
+output_dir = '/home/ubuntu/bartone/batch4_epochs150'
 max_seq_length = 64
 data_num_workers = 51
 dataset_name = 'bookcorpus'
-per_device_train_batch_size = 8
-per_device_eval_batch_size = 16
+per_device_train_batch_size = 16
+per_device_eval_batch_size = 8
 weight_decay = 0.1
 learning_rate = 5e-5
 max_train_steps = None
-num_train_epochs = 50
+num_train_epochs = 100
 num_warmup_steps = 500
 checkpointing_steps_set = 'epoch'
 log_steps = 1
@@ -93,15 +93,15 @@ if accelerator.is_main_process:
 
 accelerator.wait_for_everyone()
 
-dataset = load_dataset(dataset_name, split="train[5%:10%]", cache_dir='/home/ubuntu/huggingface')
+dataset = load_dataset(dataset_name, split="train[10%:15%]", cache_dir='/home/ubuntu/huggingface')
 train_data_txt, validation_data_txt = dataset.train_test_split(test_size=0.1).values()
 # if "validation" not in raw_datasets.keys():
 
 
 column_names = train_data_txt.column_names
 text_column_name = "text" if "text" in column_names else column_names[0]
-tokenizer = BartTokenizerFast.from_pretrained("/home/ubuntu/bartone/final_epoch/gpt2_tokenizer")
-model = BartForConditionalGenerationOneNoise.from_pretrained("/home/ubuntu/bartone/final_epoch")
+tokenizer = BartTokenizerFast.from_pretrained("/home/ubuntu/bartone_noise_batch_hard_noisescale/final_epoch/bart_tokenizer")
+model = BartForConditionalGenerationOneNoise.from_pretrained("/home/ubuntu/bartone_noise_batch_hard_noisescale/final_epoch")
 
 
 def tokenize_function(examples):
@@ -236,7 +236,7 @@ for epoch in range(starting_epoch, num_train_epochs):
     losses = []
     for step, batch in enumerate(eval_dataloader):
         with torch.no_grad():
-            outputs = model(**batch)
+            outputs = model(**batch, batch_noise=batch_noise)
 
         loss = outputs.loss
         losses.append(accelerator.gather_for_metrics(loss.repeat(per_device_eval_batch_size)))

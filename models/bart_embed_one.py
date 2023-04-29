@@ -762,17 +762,14 @@ class BartForConditionalGenerationOneNoise(BartPretrainedModel):
         if batch_noise is not None:
             encoder_outputs = self.model.encoder(input_ids=input_ids, attention_mask=attention_mask)
             sentence_rep = encoder_outputs[0][:,0,:][:, None, :]
-            bsz = sentence_rep.shape[0]
             # bsz * batch_noise x 1 x 768
-            sentence_rep = sentence_rep.repeat((batch_noise, 1, 1))
-            added_noise = torch.randn_like(sentence_rep)
-            # one has the original
-            added_noise[:bsz, :, :] = 0.
+            sentence_rep_repeat = sentence_rep.repeat((batch_noise, 1, 1))
+            added_noise = torch.randn_like(sentence_rep_repeat) * 5.0
 
-            noised_sentence_reps = sentence_rep + added_noise.detach()
+            noised_sentence_reps = sentence_rep_repeat + added_noise
 
             # originally (bsz x 1 x 768)
-            encoder_outputs = (noised_sentence_reps, )
+            encoder_outputs_noised = (noised_sentence_reps, )
             # originally (bsz x seq_len)
             input_ids = input_ids.repeat((batch_noise, 1))
 
@@ -781,7 +778,8 @@ class BartForConditionalGenerationOneNoise(BartPretrainedModel):
 
             # originally (bsz x seq_len)
             labels = labels.repeat((batch_noise, 1))
-
+        else:
+            encoder_outputs_noised = encoder_outputs
         if labels is not None:
             if use_cache:
                 logger.warning("The `use_cache` argument is changed to `False` since `labels` is provided.")
@@ -796,7 +794,7 @@ class BartForConditionalGenerationOneNoise(BartPretrainedModel):
             input_ids,
             attention_mask=attention_mask,
             decoder_input_ids=decoder_input_ids,
-            encoder_outputs=encoder_outputs,
+            encoder_outputs=encoder_outputs_noised,
             decoder_attention_mask=decoder_attention_mask,
             head_mask=head_mask,
             decoder_head_mask=decoder_head_mask,
@@ -851,7 +849,8 @@ class BartForConditionalGenerationOneNoise(BartPretrainedModel):
         if past_key_values is not None:
             decoder_input_ids = decoder_input_ids[:, -1:]
 
-        return {
+
+        gen_inputs = {
             "input_ids": None,  # encoder_outputs is defined. input_ids not needed
             "encoder_outputs": encoder_outputs,
             "past_key_values": past_key_values,
@@ -863,6 +862,7 @@ class BartForConditionalGenerationOneNoise(BartPretrainedModel):
             "cross_attn_head_mask": cross_attn_head_mask,
             "use_cache": use_cache,  # change this to avoid caching (presumably for debugging)
         }
+        return gen_inputs
 
     def prepare_decoder_input_ids_from_labels(self, labels: torch.Tensor):
         return shift_tokens_right(labels, self.config.pad_token_id, self.config.decoder_start_token_id)
