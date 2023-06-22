@@ -9,6 +9,8 @@ __pycache__/
 # Distribution / packaging
 output.txt
 outputs.txt
+clip_noise0.01.txt
+
 wandb/
 .Python
 build/
