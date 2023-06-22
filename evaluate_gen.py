@@ -151,10 +151,12 @@ def _get_logits_processor(
         return processors
 
 
-tokenizer = BartTokenizerFast.from_pretrained("/home/ubuntu/bartone/final_epoch/gpt2_tokenizer")
-model = BartForConditionalGenerationOne.from_pretrained("/home/ubuntu/bartone/final_epoch")
-
-
+# tokenizer = BartTokenizerFast.from_pretrained("/home/ubuntu/bartone/reconstruction/no_noise/bart_tokenizer")
+# model = BartForConditionalGenerationOne.from_pretrained("/home/ubuntu/bartone/reconstruction/no_noise")
+# tokenizer = BartTokenizerFast.from_pretrained("/home/ubuntu/bartone/reconstruction/no_noise/bart_tokenizer")
+# model = BartForConditionalGenerationOne.from_pretrained("/home/ubuntu/bartone/noise0.1/epoch_4")
+tokenizer = BartTokenizerFast.from_pretrained("/home/ubuntu/bartone/noise0.5/latest/bart_tokenizer")
+model = BartForConditionalGenerationOne.from_pretrained("/home/ubuntu/bartone/noise0.5/latest")
 max_seq_length = 64
 
 generation_config = GenerationConfig.from_model_config(model.config)
@@ -168,8 +170,9 @@ pad_token_id = generation_config.pad_token_id
 model.eval()
 
 
-mean = np.load('/home/ubuntu/seq2seq/90plus_mean.np.npy')
-covariance = np.load('/home/ubuntu/seq2seq/90plus_cov.np.npy')
+mean = np.load('/home/ubuntu/seq2seq_repo/seq2seq/50-51plus_mean_noise0.5.np.npy')
+covariance = np.load('/home/ubuntu/seq2seq_repo/seq2seq/50-51plus_cov_noise0.5.np.npy')
+print('trace', np.trace(covariance))
 num_samples = 50
 samples = np.random.multivariate_normal(mean, covariance, size=num_samples)
 generated_sentences = []
@@ -211,7 +214,7 @@ for n in range(num_samples):
         done_input_ids = input_ids
         output_str = tokenizer.batch_decode(done_input_ids, skip_special_tokens=True)
         generated_sentences.append(output_str[0])
-        print(output_str)
+        print(output_str[0])
 
 with open('/home/ubuntu/seq2seq/gen_sentences.txt', 'w+') as f:
     for generated_sentence in generated_sentences:

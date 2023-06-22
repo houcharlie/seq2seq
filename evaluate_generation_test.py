@@ -161,9 +161,14 @@ def _get_logits_processor(
 
 dataset = load_dataset('bookcorpus', split="train[74004000:]", cache_dir='/home/ubuntu/huggingface')
 
-tokenizer = BartTokenizerFast.from_pretrained("/home/ubuntu/bartone/final_epoch/gpt2_tokenizer")
-model = BartForConditionalGenerationOne.from_pretrained("/home/ubuntu/bartone/final_epoch")
-
+# tokenizer = BartTokenizerFast.from_pretrained("/home/ubuntu/bartone/noise0.5/latest/bart_tokenizer")
+# model = BartForConditionalGenerationOne.from_pretrained("/home/ubuntu/bartone/noise0.5/latest")
+tokenizer = BartTokenizerFast.from_pretrained("/home/ubuntu/bartone/reconstruction/no_noise/bart_tokenizer")
+model = BartForConditionalGenerationOne.from_pretrained("/home/ubuntu/bartone/reconstruction/no_noise")
+# tokenizer = BartTokenizerFast.from_pretrained("/home/ubuntu/bartone/reconstruction/no_noise/bart_tokenizer")
+# model = BartForConditionalGenerationOne.from_pretrained("/home/ubuntu/bartone/noiseunk")
+# tokenizer = BartTokenizerFast.from_pretrained("/home/ubuntu/bartone/reconstruction/no_noise/bart_tokenizer")
+# model = BartForConditionalGenerationOne.from_pretrained("/home/ubuntu/bartone/noise0.1/epoch_4")
 encoder = model.get_encoder()
 column_names = dataset.column_names
 max_seq_length = 64
@@ -209,6 +214,7 @@ example = {'input_ids': torch.tensor(test_dataset['input_ids'][0])[None,:], 'att
 unfinished_sequences = torch.ones(input_ids.shape[0], dtype=torch.long)
 with torch.no_grad():
     encoder_outputs = encoder(**example)
+    encoder_outputs['last_hidden_state'] += torch.randn_like(encoder_outputs['last_hidden_state']) * 0.1
     input_ids = torch.ones((1, 1), dtype=torch.long) * bos_token
     eos_token_id_tensor = torch.tensor(eos_token_id).to(input_ids.device) if eos_token_id is not None else None
     while True:
@@ -234,11 +240,10 @@ with torch.no_grad():
             break
     done_input_ids = input_ids
     output_str = tokenizer.batch_decode(done_input_ids, skip_special_tokens=True)
-    print('Output ids', done_input_ids)
-    print('Output id length', print(done_input_ids.shape))
 
-    print('Input', dataset['text'][0])
-    print('Output', output_str)
+
+    print('Input\n', dataset['text'][0])
+    print('Output\n', output_str[0])
 
 
 # for step, batch in enumerate(train_dataloader):

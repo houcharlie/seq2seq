@@ -762,9 +762,12 @@ class BartForConditionalGenerationOneNoise(BartPretrainedModel):
         if batch_noise is not None:
             encoder_outputs = self.model.encoder(input_ids=input_ids, attention_mask=attention_mask)
             sentence_rep = encoder_outputs[0][:,0,:][:, None, :]
+            # clip down to norm 1
+            sentence_rep = sentence_rep / torch.max(torch.norm(sentence_rep), torch.tensor(1.))
+
             # bsz * batch_noise x 1 x 768
             sentence_rep_repeat = sentence_rep.repeat((batch_noise, 1, 1))
-            added_noise = torch.randn_like(sentence_rep_repeat) * 5.0
+            added_noise = torch.randn_like(sentence_rep_repeat) * 0.1
 
             noised_sentence_reps = sentence_rep_repeat + added_noise
 

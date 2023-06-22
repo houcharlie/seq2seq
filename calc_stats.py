@@ -7,10 +7,13 @@ from tqdm import tqdm
 import numpy as np
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-dataset = load_dataset('bookcorpus', split="train[95%:]", cache_dir='/home/ubuntu/huggingface')
-tokenizer = BartTokenizerFast.from_pretrained("/home/ubuntu/bartone/final_epoch/gpt2_tokenizer")
-model = BartForConditionalGenerationOne.from_pretrained("/home/ubuntu/bartone/final_epoch")
-
+dataset = load_dataset('bookcorpus', split="train[50%:51%]", cache_dir='/home/ubuntu/huggingface')
+# tokenizer = BartTokenizerFast.from_pretrained("/home/ubuntu/bartone/reconstruction/no_noise/bart_tokenizer")
+# model = BartForConditionalGenerationOne.from_pretrained("/home/ubuntu/bartone/noise0.1/epoch_4")
+# tokenizer = BartTokenizerFast.from_pretrained("/home/ubuntu/bartone/noise0.5/latest/bart_tokenizer")
+# model = BartForConditionalGenerationOne.from_pretrained("/home/ubuntu/bartone/noise0.5/latest")
+tokenizer = BartTokenizerFast.from_pretrained("/home/ubuntu/bartone/reconstruction/no_noise/bart_tokenizer")
+model = BartForConditionalGenerationOne.from_pretrained("/home/ubuntu/bartone/reconstruction/no_noise")
 encoder = model.get_encoder()
 column_names = dataset.column_names
 max_seq_length = 64
@@ -54,5 +57,5 @@ sentence_rep_vec = np.vstack(sentence_rep_list)
 
 sentence_mean = np.mean(sentence_rep_vec, axis=0)
 sentence_cov = np.cov(sentence_rep_vec, rowvar=False)
-np.save('/home/ubuntu/seq2seq/90plus_mean.np', sentence_mean)
-np.save('/home/ubuntu/seq2seq/90plus_cov.np', sentence_cov)
+np.save('/home/ubuntu/seq2seq_repo/seq2seq/50-51plus_mean_noise0.np', sentence_mean)
+np.save('/home/ubuntu/seq2seq_repo/seq2seq/50-51plus_cov_noise0.np', sentence_cov)

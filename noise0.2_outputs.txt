@@ -1,0 +1,208 @@
+/home/ubuntu/venv/lib/python3.9/site-packages/accelerate/accelerator.py:249: FutureWarning: `logging_dir` is deprecated and will be removed in version 0.18.0 of 🤗 Accelerate. Use `project_dir` instead.
+  warnings.warn(
+06/22/2023 00:02:36 - INFO - __main__ - Distributed environment: NO
+Num processes: 1
+Process index: 0
+Local process index: 0
+Device: cuda
+
+Mixed precision type: no
+
+06/22/2023 00:02:37 - WARNING - datasets.builder - Found cached dataset bookcorpus (/home/ubuntu/huggingface/bookcorpus/plain_text/1.0.0/eddee3cae1cc263a431aa98207d4d27fd8a73b0a9742f692af0e6c65afa4d75f)
+loading file vocab.json
+loading file merges.txt
+loading file tokenizer.json
+loading file added_tokens.json
+loading file special_tokens_map.json
+loading file tokenizer_config.json
+loading configuration file /home/ubuntu/bartone/reconstruction/no_noise/config.json
+Model config BartConfig {
+  "_name_or_path": "facebook/bart-base",
+  "activation_dropout": 0.1,
+  "activation_function": "gelu",
+  "add_bias_logits": false,
+  "add_final_layer_norm": false,
+  "architectures": [
+    "BartForConditionalGenerationOne"
+  ],
+  "attention_dropout": 0.1,
+  "bos_token_id": 0,
+  "classif_dropout": 0.1,
+  "classifier_dropout": 0.0,
+  "d_model": 768,
+  "decoder_attention_heads": 12,
+  "decoder_ffn_dim": 3072,
+  "decoder_layerdrop": 0.0,
+  "decoder_layers": 6,
+  "decoder_start_token_id": 2,
+  "dropout": 0.1,
+  "early_stopping": true,
+  "encoder_attention_heads": 12,
+  "encoder_ffn_dim": 3072,
+  "encoder_layerdrop": 0.0,
+  "encoder_layers": 6,
+  "eos_token_id": 2,
+  "forced_bos_token_id": 0,
+  "forced_eos_token_id": 2,
+  "gradient_checkpointing": false,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1",
+    "2": "LABEL_2"
+  },
+  "init_std": 0.02,
+  "is_encoder_decoder": true,
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1,
+    "LABEL_2": 2
+  },
+  "max_position_embeddings": 1024,
+  "model_type": "bart",
+  "no_repeat_ngram_size": 3,
+  "normalize_before": false,
+  "normalize_embedding": true,
+  "num_beams": 4,
+  "num_hidden_layers": 6,
+  "pad_token_id": 1,
+  "scale_embedding": false,
+  "task_specific_params": {
+    "summarization": {
+      "length_penalty": 1.0,
+      "max_length": 128,
+      "min_length": 12,
+      "num_beams": 4
+    },
+    "summarization_cnn": {
+      "length_penalty": 2.0,
+      "max_length": 142,
+      "min_length": 56,
+      "num_beams": 4
+    },
+    "summarization_xsum": {
+      "length_penalty": 1.0,
+      "max_length": 62,
+      "min_length": 11,
+      "num_beams": 6
+    }
+  },
+  "torch_dtype": "float32",
+  "transformers_version": "4.27.4",
+  "use_cache": true,
+  "vocab_size": 50265
+}
+
+loading weights file /home/ubuntu/bartone/reconstruction/no_noise/pytorch_model.bin
+Generate config GenerationConfig {
+  "_from_model_config": true,
+  "bos_token_id": 0,
+  "decoder_start_token_id": 2,
+  "early_stopping": true,
+  "eos_token_id": 2,
+  "forced_bos_token_id": 0,
+  "forced_eos_token_id": 2,
+  "no_repeat_ngram_size": 3,
+  "num_beams": 4,
+  "pad_token_id": 1,
+  "transformers_version": "4.27.4"
+}
+
+All model checkpoint weights were used when initializing BartForConditionalGenerationOneNoise.
+
+All the weights of BartForConditionalGenerationOneNoise were initialized from the model checkpoint at /home/ubuntu/bartone/reconstruction/no_noise.
+If your task is similar to the task the model of the checkpoint was trained on, you can already use BartForConditionalGenerationOneNoise for predictions without further training.
+loading configuration file /home/ubuntu/bartone/reconstruction/no_noise/generation_config.json
+Generate config GenerationConfig {
+  "_from_model_config": true,
+  "bos_token_id": 0,
+  "decoder_start_token_id": 2,
+  "early_stopping": true,
+  "eos_token_id": 2,
+  "forced_bos_token_id": 0,
+  "forced_eos_token_id": 2,
+  "no_repeat_ngram_size": 3,
+  "num_beams": 4,
+  "pad_token_id": 1,
+  "transformers_version": "4.27.4"
+}
+
+Running bart tokenizers on train dataset (num_proc=51):   0%|          | 0/666037 [00:00<?, ? examples/s]Running bart tokenizers on train dataset (num_proc=51):   0%|          | 1000/666037 [00:01<13:19, 831.61 examples/s]Running bart tokenizers on train dataset (num_proc=51):   1%|          | 5000/666037 [00:01<02:23, 4617.04 examples/s]Running bart tokenizers on train dataset (num_proc=51):   1%|          | 8000/666037 [00:01<01:27, 7517.81 examples/s]Running bart tokenizers on train dataset (num_proc=51):   2%|▏         | 10000/666037 [00:01<01:13, 8884.50 examples/s]Running bart tokenizers on train dataset (num_proc=51):   2%|▏         | 13000/666037 [00:01<00:53, 12119.82 examples/s]Running bart tokenizers on train dataset (num_proc=51):   2%|▏         | 16000/666037 [00:02<01:01, 10576.43 examples/s]Running bart tokenizers on train dataset (num_proc=51):   3%|▎         | 21000/666037 [00:02<00:42, 15244.88 examples/s]Running bart tokenizers on train dataset (num_proc=51):   4%|▎         | 24000/666037 [00:02<00:47, 13536.11 examples/s]Running bart tokenizers on train dataset (num_proc=51):   4%|▍         | 27000/666037 [00:02<00:40, 15896.72 examples/s]Running bart tokenizers on train dataset (num_proc=51):   5%|▍         | 32000/666037 [00:02<00:30, 20813.36 examples/s]Running bart tokenizers on train dataset (num_proc=51):   6%|▌         | 38000/666037 [00:02<00:23, 26991.36 examples/s]Running bart tokenizers on train dataset (num_proc=51):   7%|▋         | 47000/666037 [00:03<00:15, 39797.26 examples/s]Running bart tokenizers on train dataset (num_proc=51):   8%|▊         | 53000/666037 [00:03<00:14, 42823.76 examples/s]Running bart tokenizers on train dataset (num_proc=51):   9%|▊         | 58000/666037 [00:03<00:15, 39003.81 examples/s]Running bart tokenizers on train dataset (num_proc=51):  10%|▉         | 64000/666037 [00:03<00:14, 41387.51 examples/s]Running bart tokenizers on train dataset (num_proc=51):  10%|█         | 69000/666037 [00:03<00:16, 36198.17 examples/s]Running bart tokenizers on train dataset (num_proc=51):  11%|█         | 73000/666037 [00:03<00:20, 29252.32 examples/s]Running bart tokenizers on train dataset (num_proc=51):  12%|█▏        | 77000/666037 [00:04<00:22, 25650.58 examples/s]Running bart tokenizers on train dataset (num_proc=51):  12%|█▏        | 80000/666037 [00:04<00:23, 24834.22 examples/s]Running bart tokenizers on train dataset (num_proc=51):  13%|█▎        | 87000/666037 [00:04<00:17, 32486.34 examples/s]Running bart tokenizers on train dataset (num_proc=51):  14%|█▍        | 95000/666037 [00:04<00:13, 41173.01 examples/s]Running bart tokenizers on train dataset (num_proc=51):  15%|█▌        | 103000/666037 [00:04<00:11, 49743.28 examples/s]Running bart tokenizers on train dataset (num_proc=51):  16%|█▋        | 109000/666037 [00:04<00:13, 41486.15 examples/s]Running bart tokenizers on train dataset (num_proc=51):  17%|█▋        | 114000/666037 [00:04<00:14, 37738.41 examples/s]Running bart tokenizers on train dataset (num_proc=51):  18%|█▊        | 119000/666037 [00:05<00:16, 33109.91 examples/s]Running bart tokenizers on train dataset (num_proc=51):  19%|█▉        | 125000/666037 [00:05<00:15, 35174.53 examples/s]Running bart tokenizers on train dataset (num_proc=51):  19%|█▉        | 129000/666037 [00:05<00:20, 25822.59 examples/s]Running bart tokenizers on train dataset (num_proc=51):  20%|█▉        | 133000/666037 [00:05<00:20, 25768.84 examples/s]Running bart tokenizers on train dataset (num_proc=51):  21%|██        | 138000/666037 [00:05<00:17, 29568.35 examples/s]Running bart tokenizers on train dataset (num_proc=51):  22%|██▏       | 149000/666037 [00:05<00:11, 45689.02 examples/s]Running bart tokenizers on train dataset (num_proc=51):  23%|██▎       | 155000/666037 [00:06<00:10, 47780.18 examples/s]Running bart tokenizers on train dataset (num_proc=51):  24%|██▍       | 162000/666037 [00:06<00:12, 41448.52 examples/s]Running bart tokenizers on train dataset (num_proc=51):  25%|██▌       | 167000/666037 [00:06<00:15, 31811.70 examples/s]Running bart tokenizers on train dataset (num_proc=51):  26%|██▌       | 172000/666037 [00:06<00:14, 34620.00 examples/s]Running bart tokenizers on train dataset (num_proc=51):  27%|██▋       | 178000/666037 [00:06<00:13, 35854.38 examples/s]Running bart tokenizers on train dataset (num_proc=51):  27%|██▋       | 183000/666037 [00:07<00:18, 25470.58 examples/s]Running bart tokenizers on train dataset (num_proc=51):  28%|██▊       | 189000/666037 [00:07<00:16, 29384.54 examples/s]Running bart tokenizers on train dataset (num_proc=51):  30%|██▉       | 198000/666037 [00:07<00:12, 37855.13 examples/s]Running bart tokenizers on train dataset (num_proc=51):  31%|███       | 206000/666037 [00:07<00:10, 45800.80 examples/s]Running bart tokenizers on train dataset (num_proc=51):  32%|███▏      | 212000/666037 [00:07<00:09, 46544.76 examples/s]Running bart tokenizers on train dataset (num_proc=51):  33%|███▎      | 218000/666037 [00:07<00:14, 31026.34 examples/s]Running bart tokenizers on train dataset (num_proc=51):  33%|███▎      | 223000/666037 [00:08<00:14, 30886.13 examples/s]Running bart tokenizers on train dataset (num_proc=51):  34%|███▍      | 227000/666037 [00:08<00:13, 32343.87 examples/s]Running bart tokenizers on train dataset (num_proc=51):  35%|███▍      | 231000/666037 [00:08<00:20, 21520.83 examples/s]Running bart tokenizers on train dataset (num_proc=51):  35%|███▌      | 235000/666037 [00:08<00:19, 22446.74 examples/s]Running bart tokenizers on train dataset (num_proc=51):  36%|███▌      | 240000/666037 [00:08<00:15, 26989.75 examples/s]Running bart tokenizers on train dataset (num_proc=51):  37%|███▋      | 244000/666037 [00:09<00:15, 27425.07 examples/s]Running bart tokenizers on train dataset (num_proc=51):  38%|███▊      | 250000/666037 [00:09<00:14, 29702.75 examples/s]Running bart tokenizers on train dataset (num_proc=51):  38%|███▊      | 254000/666037 [00:09<00:23, 17682.35 examples/s]Running bart tokenizers on train dataset (num_proc=51):  39%|███▊      | 257000/666037 [00:09<00:21, 19197.05 examples/s]Running bart tokenizers on train dataset (num_proc=51):  39%|███▉      | 260000/666037 [00:09<00:21, 18690.51 examples/s]Running bart tokenizers on train dataset (num_proc=51):  39%|███▉      | 263000/666037 [00:10<00:20, 19512.17 examples/s]Running bart tokenizers on train dataset (num_proc=51):  40%|███▉      | 266000/666037 [00:10<00:20, 19135.73 examples/s]Running bart tokenizers on train dataset (num_proc=51):  41%|████      | 270000/666037 [00:10<00:24, 16239.53 examples/s]Running bart tokenizers on train dataset (num_proc=51):  41%|████      | 273000/666037 [00:10<00:21, 18261.95 examples/s]Running bart tokenizers on train dataset (num_proc=51):  41%|████▏     | 276000/666037 [00:11<00:26, 14550.36 examples/s]Running bart tokenizers on train dataset (num_proc=51):  42%|████▏     | 279000/666037 [00:11<00:25, 15231.68 examples/s]Running bart tokenizers on train dataset (num_proc=51):  43%|████▎     | 285000/666037 [00:11<00:18, 20720.02 examples/s]Running bart tokenizers on train dataset (num_proc=51):  44%|████▎     | 290000/666037 [00:11<00:15, 24380.29 examples/s]Running bart tokenizers on train dataset (num_proc=51):  45%|████▌     | 300000/666037 [00:11<00:09, 37168.01 examples/s]Running bart tokenizers on train dataset (num_proc=51):  46%|████▌     | 305000/666037 [00:11<00:09, 39367.74 examples/s]Running bart tokenizers on train dataset (num_proc=51):  47%|████▋     | 310000/666037 [00:11<00:08, 39826.99 examples/s]Running bart tokenizers on train dataset (num_proc=51):  47%|████▋     | 315000/666037 [00:12<00:09, 36655.19 examples/s]Running bart tokenizers on train dataset (num_proc=51):  48%|████▊     | 319000/666037 [00:12<00:09, 36573.41 examples/s]Running bart tokenizers on train dataset (num_proc=51):  48%|████▊     | 323000/666037 [00:12<00:09, 36449.24 examples/s]Running bart tokenizers on train dataset (num_proc=51):  49%|████▉     | 327000/666037 [00:12<00:14, 23776.38 examples/s]Running bart tokenizers on train dataset (num_proc=51):  50%|████▉     | 331000/666037 [00:12<00:14, 23311.55 examples/s]Running bart tokenizers on train dataset (num_proc=51):  50%|█████     | 335000/666037 [00:12<00:12, 25825.25 examples/s]Running bart tokenizers on train dataset (num_proc=51):  51%|█████▏    | 343000/666037 [00:12<00:08, 36543.31 examples/s]Running bart tokenizers on train dataset (num_proc=51):  52%|█████▏    | 349000/666037 [00:13<00:07, 40796.26 examples/s]Running bart tokenizers on train dataset (num_proc=51):  53%|█████▎    | 355000/666037 [00:13<00:07, 42803.54 examples/s]Running bart tokenizers on train dataset (num_proc=51):  54%|█████▍    | 361000/666037 [00:13<00:07, 42510.54 examples/s]Running bart tokenizers on train dataset (num_proc=51):  55%|█████▌    | 367000/666037 [00:13<00:06, 43931.89 examples/s]Running bart tokenizers on train dataset (num_proc=51):  56%|█████▌    | 372000/666037 [00:13<00:08, 33276.01 examples/s]Running bart tokenizers on train dataset (num_proc=51):  57%|█████▋    | 377000/666037 [00:14<00:11, 25117.00 examples/s]Running bart tokenizers on train dataset (num_proc=51):  57%|█████▋    | 382000/666037 [00:14<00:10, 26987.29 examples/s]Running bart tokenizers on train dataset (num_proc=51):  58%|█████▊    | 388000/666037 [00:14<00:09, 30850.63 examples/s]Running bart tokenizers on train dataset (num_proc=51):  59%|█████▉    | 395000/666037 [00:14<00:07, 38371.29 examples/s]Running bart tokenizers on train dataset (num_proc=51):  60%|██████    | 400000/666037 [00:14<00:06, 38320.79 examples/s]Running bart tokenizers on train dataset (num_proc=51):  61%|██████▏   | 409000/666037 [00:14<00:05, 46162.22 examples/s]Running bart tokenizers on train dataset (num_proc=51):  62%|██████▏   | 415000/666037 [00:14<00:05, 47572.81 examples/s]Running bart tokenizers on train dataset (num_proc=51):  63%|██████▎   | 421000/666037 [00:15<00:07, 31994.67 examples/s]Running bart tokenizers on train dataset (num_proc=51):  64%|██████▍   | 426000/666037 [00:15<00:07, 30244.43 examples/s]Running bart tokenizers on train dataset (num_proc=51):  65%|██████▍   | 430000/666037 [00:15<00:08, 29196.97 examples/s]Running bart tokenizers on train dataset (num_proc=51):  65%|██████▌   | 434000/666037 [00:15<00:09, 24715.47 examples/s]Running bart tokenizers on train dataset (num_proc=51):  67%|██████▋   | 444000/666037 [00:15<00:06, 36714.63 examples/s]Running bart tokenizers on train dataset (num_proc=51):  68%|██████▊   | 450000/666037 [00:15<00:05, 41187.37 examples/s]Running bart tokenizers on train dataset (num_proc=51):  68%|██████▊   | 455000/666037 [00:16<00:05, 38516.91 examples/s]Running bart tokenizers on train dataset (num_proc=51):  69%|██████▉   | 462000/666037 [00:16<00:04, 44761.20 examples/s]Running bart tokenizers on train dataset (num_proc=51):  70%|███████   | 468000/666037 [00:16<00:05, 37161.96 examples/s]Running bart tokenizers on train dataset (num_proc=51):  71%|███████   | 473000/666037 [00:16<00:05, 32231.47 examples/s]Running bart tokenizers on train dataset (num_proc=51):  72%|███████▏  | 478000/666037 [00:16<00:05, 33319.50 examples/s]Running bart tokenizers on train dataset (num_proc=51):  72%|███████▏  | 482000/666037 [00:17<00:07, 24582.00 examples/s]Running bart tokenizers on train dataset (num_proc=51):  73%|███████▎  | 487000/666037 [00:17<00:06, 28570.19 examples/s]Running bart tokenizers on train dataset (num_proc=51):  74%|███████▍  | 494000/666037 [00:17<00:04, 36208.42 examples/s]Running bart tokenizers on train dataset (num_proc=51):  75%|███████▌  | 500000/666037 [00:17<00:04, 39980.28 examples/s]Running bart tokenizers on train dataset (num_proc=51):  76%|███████▌  | 505000/666037 [00:17<00:04, 38947.98 examples/s]Running bart tokenizers on train dataset (num_proc=51):  77%|███████▋  | 510000/666037 [00:17<00:03, 39256.54 examples/s]Running bart tokenizers on train dataset (num_proc=51):  77%|███████▋  | 516000/666037 [00:17<00:03, 37943.99 examples/s]Running bart tokenizers on train dataset (num_proc=51):  78%|███████▊  | 521000/666037 [00:17<00:03, 39974.45 examples/s]Running bart tokenizers on train dataset (num_proc=51):  79%|███████▉  | 526000/666037 [00:18<00:03, 38531.52 examples/s]Running bart tokenizers on train dataset (num_proc=51):  80%|███████▉  | 531000/666037 [00:18<00:04, 30486.02 examples/s]Running bart tokenizers on train dataset (num_proc=51):  80%|████████  | 535000/666037 [00:18<00:05, 25435.80 examples/s]Running bart tokenizers on train dataset (num_proc=51):  81%|████████  | 541000/666037 [00:18<00:04, 30883.03 examples/s]Running bart tokenizers on train dataset (num_proc=51):  82%|████████▏ | 548000/666037 [00:18<00:03, 37967.50 examples/s]Running bart tokenizers on train dataset (num_proc=51):  83%|████████▎ | 554000/666037 [00:18<00:02, 39563.39 examples/s]Running bart tokenizers on train dataset (num_proc=51):  84%|████████▍ | 559000/666037 [00:19<00:02, 35793.24 examples/s]Running bart tokenizers on train dataset (num_proc=51):  85%|████████▍ | 563000/666037 [00:19<00:03, 33861.52 examples/s]Running bart tokenizers on train dataset (num_proc=51):  85%|████████▌ | 568000/666037 [00:19<00:02, 37157.85 examples/s]Running bart tokenizers on train dataset (num_proc=51):  86%|████████▌ | 574000/666037 [00:19<00:02, 42283.68 examples/s]Running bart tokenizers on train dataset (num_proc=51):  87%|████████▋ | 579000/666037 [00:19<00:02, 41627.20 examples/s]Running bart tokenizers on train dataset (num_proc=51):  88%|████████▊ | 584060/666037 [00:19<00:02, 28913.90 examples/s]Running bart tokenizers on train dataset (num_proc=51):  88%|████████▊ | 588060/666037 [00:20<00:02, 27804.99 examples/s]Running bart tokenizers on train dataset (num_proc=51):  89%|████████▉ | 592180/666037 [00:20<00:02, 29988.24 examples/s]Running bart tokenizers on train dataset (num_proc=51):  90%|████████▉ | 598240/666037 [00:20<00:01, 34732.25 examples/s]Running bart tokenizers on train dataset (num_proc=51):  91%|█████████ | 605300/666037 [00:20<00:01, 41954.92 examples/s]Running bart tokenizers on train dataset (num_proc=51):  92%|█████████▏| 610480/666037 [00:20<00:01, 36090.36 examples/s]Running bart tokenizers on train dataset (num_proc=51):  92%|█████████▏| 614660/666037 [00:20<00:01, 34599.30 examples/s]Running bart tokenizers on train dataset (num_proc=51):  93%|█████████▎| 620840/666037 [00:20<00:01, 40539.16 examples/s]Running bart tokenizers on train dataset (num_proc=51):  94%|█████████▍| 629020/666037 [00:20<00:00, 47734.56 examples/s]Running bart tokenizers on train dataset (num_proc=51):  95%|█████████▌| 634140/666037 [00:21<00:00, 43590.22 examples/s]Running bart tokenizers on train dataset (num_proc=51):  96%|█████████▌| 639437/666037 [00:21<00:00, 41712.07 examples/s]Running bart tokenizers on train dataset (num_proc=51):  97%|█████████▋| 644556/666037 [00:21<00:00, 42669.36 examples/s]Running bart tokenizers on train dataset (num_proc=51):  98%|█████████▊| 651675/666037 [00:21<00:00, 49156.00 examples/s]Running bart tokenizers on train dataset (num_proc=51):  99%|█████████▉| 657793/666037 [00:22<00:00, 14462.97 examples/s]Running bart tokenizers on train dataset (num_proc=51): 100%|█████████▉| 664912/666037 [00:25<00:00, 5813.52 examples/s]                                                                                                                         Running bart tokenizers on validationdataset (num_proc=51):   0%|          | 0/74005 [00:00<?, ? examples/s]Running bart tokenizers on validationdataset (num_proc=51):   1%|▏         | 1000/74005 [00:01<02:03, 591.15 examples/s]Running bart tokenizers on validationdataset (num_proc=51):   8%|▊         | 6000/74005 [00:01<00:16, 4172.85 examples/s]Running bart tokenizers on validationdataset (num_proc=51):  12%|█▏        | 9000/74005 [00:01<00:09, 6559.39 examples/s]Running bart tokenizers on validationdataset (num_proc=51):  20%|██        | 15000/74005 [00:02<00:04, 12516.82 examples/s]Running bart tokenizers on validationdataset (num_proc=51):  26%|██▌       | 19000/74005 [00:02<00:03, 15844.20 examples/s]Running bart tokenizers on validationdataset (num_proc=51):  31%|███       | 22904/74005 [00:02<00:02, 19398.37 examples/s]Running bart tokenizers on validationdataset (num_proc=51):  40%|███▉      | 29258/74005 [00:02<00:01, 26303.78 examples/s]Running bart tokenizers on validationdataset (num_proc=51):  45%|████▍     | 33160/74005 [00:02<00:01, 28108.10 examples/s]Running bart tokenizers on validationdataset (num_proc=51):  51%|█████     | 37867/74005 [00:02<00:01, 31196.55 examples/s]Running bart tokenizers on validationdataset (num_proc=51):  58%|█████▊    | 42671/74005 [00:02<00:00, 34197.78 examples/s]Running bart tokenizers on validationdataset (num_proc=51):  69%|██████▉   | 51181/74005 [00:02<00:00, 46477.48 examples/s]Running bart tokenizers on validationdataset (num_proc=51):  78%|███████▊  | 57436/74005 [00:03<00:00, 49251.77 examples/s]Running bart tokenizers on validationdataset (num_proc=51):  91%|█████████ | 67044/74005 [00:03<00:00, 60336.83 examples/s]Running bart tokenizers on validationdataset (num_proc=51):  99%|█████████▉| 73554/74005 [00:03<00:00, 53798.06 examples/s]                                                                                                                           wandb: Currently logged in as: hou-charlie2 (fanti-lab). Use `wandb login --relogin` to force relogin
+wandb: wandb version 0.15.4 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.14.2
+wandb: Run data is saved locally in /home/ubuntu/seq2seq_repo/seq2seq/wandb/run-20230622_000318-mvyvw1eg
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run swept-music-97
+wandb: ⭐️ View project at https://wandb.ai/fanti-lab/clm_no_trainer
+wandb: 🚀 View run at https://wandb.ai/fanti-lab/clm_no_trainer/runs/mvyvw1eg
+06/22/2023 00:03:18 - INFO - __main__ - ***** Running training *****
+06/22/2023 00:03:18 - INFO - __main__ -   Num examples = 666037
+06/22/2023 00:03:18 - INFO - __main__ -   Num Epochs = 3
+06/22/2023 00:03:18 - INFO - __main__ -   Instantaneous batch size per device = 16
+06/22/2023 00:03:18 - INFO - __main__ -   Total train batch size (w. parallel, distributed & accumulation) = 128
+06/22/2023 00:03:18 - INFO - __main__ -   Gradient Accumulation steps = 8
+06/22/2023 00:03:18 - INFO - __main__ -   Total optimization steps = 15612
+Epoch 0 step 0 loss 3.199124336242676 percent done 0.0
+Epoch 0 step 100 loss 3.3747153282165527 percent done 0.0023059185242121443
+Epoch 0 step 200 loss 3.1708602905273438 percent done 0.0048039969254419675
+Epoch 0 step 300 loss 3.2671761512756348 percent done 0.007109915449654112
+Epoch 0 step 400 loss 2.947646141052246 percent done 0.009607993850883935
+Epoch 0 step 500 loss 3.10970139503479 percent done 0.01191391237509608
+Epoch 0 step 600 loss 2.94808292388916 percent done 0.014411990776325902
+Epoch 0 step 700 loss 2.9274511337280273 percent done 0.01671790930053805
+Epoch 0 step 800 loss 2.8274588584899902 percent done 0.01921598770176787
+Epoch 0 step 900 loss 2.416325807571411 percent done 0.021521906225980016
+Epoch 0 step 1000 loss 2.4670424461364746 percent done 0.024019984627209837
+Epoch 0 step 1100 loss 2.5648629665374756 percent done 0.026325903151421984
+Epoch 0 step 1200 loss 2.2104222774505615 percent done 0.028823981552651805
+Epoch 0 step 1300 loss 2.574716091156006 percent done 0.03112990007686395
+Epoch 0 step 1400 loss 1.937301516532898 percent done 0.033627978478093776
+Epoch 0 step 1500 loss 2.2020630836486816 percent done 0.03593389700230592
+Epoch 0 step 1600 loss 1.9237093925476074 percent done 0.03843197540353574
+Epoch 0 step 1700 loss 1.9732835292816162 percent done 0.04073789392774789
+Epoch 0 step 1800 loss 1.8630163669586182 percent done 0.04323597232897771
+Epoch 0 step 1900 loss 2.2003211975097656 percent done 0.045541890853189854
+Epoch 0 step 2000 loss 1.6876637935638428 percent done 0.048039969254419675
+Epoch 0 step 2100 loss 1.8251030445098877 percent done 0.050345887778631825
+Traceback (most recent call last):
+  File "/home/ubuntu/seq2seq_repo/seq2seq/run_bart_noise.py", line 207, in <module>
+    for step, batch in enumerate(train_dataloader):
+  File "/home/ubuntu/venv/lib/python3.9/site-packages/accelerate/data_loader.py", line 387, in __iter__
+    current_batch = send_to_device(current_batch, self.device)
+  File "/home/ubuntu/venv/lib/python3.9/site-packages/accelerate/utils/operations.py", line 133, in send_to_device
+    return recursively_apply(_send_to_device, tensor, device, non_blocking, test_type=_has_to_method)
+  File "/home/ubuntu/venv/lib/python3.9/site-packages/accelerate/utils/operations.py", line 93, in recursively_apply
+    {
+  File "/home/ubuntu/venv/lib/python3.9/site-packages/accelerate/utils/operations.py", line 94, in <dictcomp>
+    k: recursively_apply(
+  File "/home/ubuntu/venv/lib/python3.9/site-packages/accelerate/utils/operations.py", line 101, in recursively_apply
+    return func(data, *args, **kwargs)
+  File "/home/ubuntu/venv/lib/python3.9/site-packages/accelerate/utils/operations.py", line 126, in _send_to_device
+    return t.to(device, non_blocking=non_blocking)
+KeyboardInterrupt
+wandb: Waiting for W&B process to finish... (failed 255). Press Control-C to abort syncing.
+Error in atexit._run_exitfuncs:
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.9/subprocess.py", line 1189, in wait
+    return self._wait(timeout=timeout)
+  File "/usr/local/lib/python3.9/subprocess.py", line 1917, in _wait
+    (pid, sts) = self._try_wait(0)
+  File "/usr/local/lib/python3.9/subprocess.py", line 1875, in _try_wait
+    (pid, sts) = os.waitpid(self.pid, wait_flags)
+KeyboardInterrupt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/venv/lib/python3.9/site-packages/wandb/sdk/wandb_manager.py", line 186, in _teardown
+    result = self._service.join()
+  File "/home/ubuntu/venv/lib/python3.9/site-packages/wandb/sdk/service/service.py", line 216, in join
+    ret = self._internal_proc.wait()
+  File "/usr/local/lib/python3.9/subprocess.py", line 1202, in wait
+    self._wait(timeout=sigint_timeout)
+  File "/usr/local/lib/python3.9/subprocess.py", line 1911, in _wait
+    time.sleep(delay)
+KeyboardInterrupt
+wandb: 🚀 View run swept-music-97 at: https://wandb.ai/fanti-lab/clm_no_trainer/runs/mvyvw1eg
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20230622_000318-mvyvw1eg/logs
